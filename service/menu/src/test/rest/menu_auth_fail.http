@@ -1,0 +1,14 @@
+# For a quick start check out our HTTP Requests collection (Tools|HTTP Client|Open HTTP Requests Collection).
+#
+# Following HTTP Request Live Templates are available:
+# * 'gtrp' and 'gtr' create a GET request with or without query parameters;
+# * 'ptr' and 'ptrp' create a POST request with a simple or parameter-like body;
+# * 'mptr' and 'fptr' create a POST request to submit a form with a text or file field (multipart/form-data);
+
+# 실패
+GET http://localhost:8030/admin/menu
+Content-Type: application/json
+Authorization: Waiter yJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0IiwiZXhwIjoxNTM1NDI4NjUwLCJpZCI6MSwidXNlcm5hbWUiOiLtmY3quLjrj5kifQ.B7qAAPtzh6kW8e1-oiH8sVG34K-e8VsYoJHw4gElBygxDfcUPqXRUADUrL0FnMYgwlvLtvDX2guv_L7aRDRW0
+
+###
+

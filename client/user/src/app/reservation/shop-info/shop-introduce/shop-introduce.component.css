@@ -1,0 +1,22 @@
+
+.info{font-family: 'Nanum Square';
+  font-size: 110%;
+  font-weight: 800;
+  color:black}
+  
+  h2{font-family: 'Nanum Square';}
+
+  
+div{
+  background-color: white;
+    background-repeat: no-repeat;
+    background-position: center;
+    text-align: center;
+    margin-left: 10%;
+    width:80%;
+  }
+  h3,h4,h6,span{ font-family:'NanumSquareRound',sans-serif;
+    font-weight:600;
+    color: #8f8f8f;
+    }
+  

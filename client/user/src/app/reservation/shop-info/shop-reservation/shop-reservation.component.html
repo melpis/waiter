@@ -1,0 +1,49 @@
+ <section id="contact">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-12">
+            <span class="info">예약</span><br><br>
+            <span>예약이 완료 되면 문자로 알림이 전달 됩니다.</span><br><br>
+
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-lg-12">
+            <form id="contactForm" name="sentMessage" novalidate="novalidate">
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <input class="form-control" id="name" type="text" name="name" [(ngModel)]="reservation.userName" placeholder="예약자 성함" required="required" data-validation-required-message="예약하시는 분의 이름">
+                    <p class="help-block text-danger"></p>
+                  </div>
+                  <div class="form-group">
+                    <input class="form-control" id="reservationDate"  name="reservationDate" [(ngModel)]="reservation.reservationDate" type="text" placeholder="방문 시간" required="required" data-validation-required-message="방문 시간">
+                    <p class="help-block text-danger"></p>
+                  </div>
+                  <div class="form-group">
+                    <input class="form-control" id="userCount" name="userCount" [(ngModel)]="reservation.userCount" type="number" placeholder="이용 인원" required="required" data-validation-required-message="이용하시려는 인원">
+                    <p class="help-block text-danger"></p>
+                  </div>
+                  <div class="form-group">
+                    <input class="form-control" id="phone" type="tel" name="contactNumber" [(ngModel)]="reservation.contactNumber" placeholder="연락처" required="required" data-validation-required-message="연락 가능한 번호">
+                    <p class="help-block text-danger"></p>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <textarea class="form-control" id="message" name="message" [(ngModel)]="reservation.message" placeholder="문의 사항" required="required" data-validation-required-message="기타 문의 사항"></textarea>
+                    <p class="help-block text-danger"></p>
+                  </div>
+                </div>
+                <div class="clearfix"></div>
+                <div class="col-lg-12 text-center">
+                  <div id="success"></div>
+                  <br>
+                  <button id="sendMessageButton" class="btn btn-primary btn-xl text-uppercase reserve-btn" (click)="post()" type="submit">예약 신청</button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>

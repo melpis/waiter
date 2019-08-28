@@ -1,0 +1,6 @@
+{
+    "/api/*": {
+        "target": "http://waiter-gateway-svc.staging.svc.cluster.local:8000",
+        "secure": false
+    }
+}

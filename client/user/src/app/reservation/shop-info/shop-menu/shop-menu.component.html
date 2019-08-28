@@ -1,0 +1,27 @@
+      <!-- Portfolio Grid -->
+      <section id="portfolio">
+
+      <div class="container">
+        <span class="info">메뉴</span><br><br>
+
+        <div class="row">
+
+          <div *ngFor="let menu of menus" class="col-md-4 col-sm-6 portfolio-item">
+            <a class="portfolio-link" data-toggle="modal" href="#portfolioModal1">
+              <div class="portfolio-hover">
+                <div class="portfolio-hover-content">
+                  <i class="fa fa-plus fa-3x"></i>
+                </div>
+              </div>
+              <div class="img"><img src={{getMenuServiceUrl(menu)}} alt="" style=" min-width: 100%;
+                width: 100%; min-height: 100%;"></div>
+            </a>
+            <div class="menu">
+              <span class="name">{{menu.name}}</span><br>
+              <span class="price">{{menu.price | number}}원</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>

@@ -1,0 +1,22 @@
+spring:
+  mvc:
+    static-path-pattern: /static/**
+  resources:
+    static-locations: classpath:/static/
+    add-mappings: true
+  datasource:
+    url: jdbc:postgresql://localhost:5432/menu
+    username: pguser
+    password: 1234!@
+    sqlScriptEncoding: UTF-8
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        jdbc:
+          lob:
+            non_contextual_creation: true
+server:
+  port: 8030

@@ -1,0 +1,315 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: waiter-client
+  name: waiter-client-svc
+  namespace: staging
+  annotations:
+    metallb.universe.tf/allow-shared-ip: waiter-bot
+spec:
+  ports:
+  - port: 9090
+    targetPort: 80
+  selector:
+    app: waiter-client
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: waiter-bot
+  name: waiter-bot-svc
+  namespace: staging
+  annotations:
+    metallb.universe.tf/allow-shared-ip: waiter-bot
+spec:
+  ports:
+  - port: 8080
+    targetPort: 8080
+  selector:
+    app: waiter-bot
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: waiter-gateway
+  name: waiter-gateway-svc
+  namespace: staging
+  annotations:
+    metallb.universe.tf/allow-shared-ip: waiter-bot
+spec:
+  ports:
+  - port: 8000
+    targetPort: 8000
+  selector:
+    app: waiter-gateway
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: waiter-menu
+  name: waiter-menu-svc
+  namespace: staging
+  annotations:
+    metallb.universe.tf/allow-shared-ip: waiter-bot
+spec:
+  ports:
+  - port: 8030
+    targetPort: 8030
+  selector:
+    app: waiter-menu
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: waiter-notification
+  name: waiter-notification-svc
+  namespace: staging
+  annotations:
+    metallb.universe.tf/allow-shared-ip: waiter-bot
+spec:
+  ports:
+  - port: 8050
+    targetPort: 8050
+  selector:
+    app: waiter-notification
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: waiter-reservation-with-events-sink
+  name: waiter-reservation-with-events-sink-svc
+  namespace: staging
+  annotations:
+    metallb.universe.tf/allow-shared-ip: waiter-bot
+spec:
+  ports:
+  - port: 8011
+    targetPort: 8011
+  selector:
+    app: waiter-reservation-with-events-sink
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: waiter-reservation-with-events-source
+  name: waiter-reservation-with-events-source-svc
+  namespace: staging
+  annotations:
+    metallb.universe.tf/allow-shared-ip: waiter-bot
+spec:
+  ports:
+  - port: 8010
+    targetPort: 8010
+  selector:
+    app: waiter-reservation-with-events-source
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: waiter-store
+  name: waiter-store-svc
+  namespace: staging
+  annotations:
+    metallb.universe.tf/allow-shared-ip: waiter-bot
+spec:
+  ports:
+  - port: 8020
+    targetPort: 8020
+  selector:
+    app: waiter-store
+  type: LoadBalancer
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: waiter-client
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: waiter-client
+    spec:
+      containers:
+      - name: waiter-client
+        image: localhost:5005/root/waiter/client
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+      imagePullSecrets:
+      - name: regcred
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: waiter-bot
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: waiter-bot
+    spec:
+      containers:
+      - name: waiter-bot
+        image: localhost:5005/root/waiter/bot
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+      imagePullSecrets:
+      - name: regcred
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: waiter-gateway
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: waiter-gateway
+    spec:
+      containers:
+      - name: waiter-gateway
+        image: localhost:5005/root/waiter/gateway
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8000
+      imagePullSecrets:
+      - name: regcred
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: waiter-menu
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: waiter-menu
+    spec:
+      containers:
+      - name: waiter-menu
+        image: localhost:5005/root/waiter/menu
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8030
+      imagePullSecrets:
+      - name: regcred
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: waiter-notification
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: waiter-notification
+    spec:
+      containers:
+      - name: waiter-notification
+        image: localhost:5005/root/waiter/notification
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8050
+      imagePullSecrets:
+      - name: regcred
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: waiter-reservation-with-events-sink
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: waiter-reservation-with-events-sink
+    spec:
+      containers:
+      - name: waiter-reservation-with-events-sink
+        image: localhost:5005/root/waiter/reservation/reservation-with-events-sink
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8011
+      imagePullSecrets:
+      - name: regcred
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: waiter-reservation-with-events-source
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: waiter-reservation-with-events-source
+    spec:
+      containers:
+      - name: waiter-reservation-with-events-source
+        image: localhost:5005/root/waiter/reservation/reservation-with-events-source
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8010
+      imagePullSecrets:
+      - name: regcred
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: waiter-sms
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: waiter-sms
+    spec:
+      containers:
+      - name: waiter-sms
+        image: localhost:5005/root/waiter/sms
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8090
+      imagePullSecrets:
+      - name: regcred
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: waiter-store
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: waiter-store
+    spec:
+      containers:
+      - name: waiter-store
+        image: localhost:5005/root/waiter/store
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8020
+      imagePullSecrets:
+      - name: regcred

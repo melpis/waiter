@@ -1,0 +1,191 @@
+stages:
+  - build
+  - package
+  - deploy
+
+job-build-user-client:
+  stage: build
+  image: node:10.13.0-alpine
+  script:
+    - cd client/user
+    - npm install
+    - npm run build
+  artifacts:
+    paths:
+      - client/user/dist/*
+job-build-reservation:
+  stage: build
+  image: maven:3-jdk-8
+  script:
+    - cd service/reservation
+    - mvn package -B -Dmaven.test.skip=true
+  artifacts:
+    paths:
+      - service/reservation/reservation-with-events-sink/target/*.jar
+      - service/reservation/reservation-with-events-source/target/*.jar
+
+job-build-gateway:
+  stage: build
+  image: maven:3-jdk-8
+  script:
+    - cd service/gateway
+    - mvn package -B -Dmaven.test.skip=true
+  artifacts:
+    paths:
+      - service/gateway/target/*.jar
+
+job-build-store:
+  stage: build
+  image: maven:3-jdk-8
+  script:
+    - cd service/store
+    - mvn package -B -Dmaven.test.skip=true
+  artifacts:
+    paths:
+      - service/store/target/*.jar
+
+job-build-menu:
+  stage: build
+  image: gradle:4.8.0-jdk8
+  script:
+    - cd service/menu
+    - gradle bootJar --stacktrace --debug
+  artifacts:
+    paths:
+      - service/menu/build/libs/*.jar
+
+job-build-authentication:
+  stage: build
+  image: gradle:4.8.0-jdk8
+  script:
+    - cd service/authentication
+    - gradle bootJar --stacktrace --debug
+  artifacts:
+    paths:
+      - service/authentication/build/libs/*.jar
+
+job-build-bot:
+  stage: build
+  image: maven:3-jdk-8
+  script:
+    - cd service/bot
+    - mvn package -B -Dmaven.test.skip=true
+  artifacts:
+    paths:
+      - service/bot/target/*.jar
+
+job-build-recommendation:
+  stage: build
+  image: maven:3-jdk-8
+  script:
+    - cd service/recommendation
+    - mvn package -B -Dmaven.test.skip=true
+  artifacts:
+    paths:
+      - service/recommendation/target/*.jar
+
+job-build-notification:
+  stage: build
+  image: maven:3-jdk-8
+  script:
+    - cd service/notification
+    - mvn package -B -Dmaven.test.skip=true
+  artifacts:
+    paths:
+      - service/notification/target/*.jar
+
+job-build-stat:
+  stage: build
+  image: maven:3-jdk-8
+  script:
+    - cd service/stat
+    - mvn package -B -Dmaven.test.skip=true
+  artifacts:
+    paths:
+      - service/stat/target/*.jar
+
+job-build-sms:
+  stage: build
+  image: gradle:4.8.0-jdk8
+  script:
+    - cd service/sms
+    - gradle bootJar --stacktrace --debug
+  artifacts:
+    paths:
+      - service/sms/build/libs/*.jar
+
+
+docker-build:
+  stage: package
+  image: docker:stable
+  services:
+    - docker:dind
+  only:
+    - tags
+  script:
+    - export DOCKER_HOST=tcp://localhost:2375/
+    - docker login localhost:5005 -u root -p 1234
+    - docker build -t localhost:5005/root/waiter/client:$CI_COMMIT_TAG  client
+    - docker push localhost:5005/root/waiter/client
+    - docker build -t localhost:5005/root/waiter/reservation/reservation-with-events-sink:$CI_COMMIT_TAG  service/reservation/reservation-with-events-sink
+    - docker push localhost:5005/root/waiter/reservation/reservation-with-events-sink
+    - docker build -t localhost:5005/root/waiter/reservation/reservation-with-events-source:$CI_COMMIT_TAG  service/reservation/reservation-with-events-source
+    - docker push localhost:5005/root/waiter/reservation/reservation-with-events-source
+    - docker build -t localhost:5005/root/waiter/gateway:$CI_COMMIT_TAG  service/gateway/
+    - docker push localhost:5005/root/waiter/gateway
+    - docker build -t localhost:5005/root/waiter/store:$CI_COMMIT_TAG  service/store/
+    - docker push localhost:5005/root/waiter/store
+    - docker build -t localhost:5005/root/waiter/menu:$CI_COMMIT_TAG  service/menu/
+    - docker push localhost:5005/root/waiter/menu
+    - docker build -t localhost:5005/root/waiter/authentication:$CI_COMMIT_TAG  service/authentication/
+    - docker push localhost:5005/root/waiter/authentication
+    - docker build -t localhost:5005/root/waiter/bot:$CI_COMMIT_TAG  service/bot/
+    - docker push localhost:5005/root/waiter/bot
+    - docker build -t localhost:5005/root/waiter/recommendation:$CI_COMMIT_TAG  service/recommendation/
+    - docker push localhost:5005/root/waiter/recommendation
+    - docker build -t localhost:5005/root/waiter/stat:$CI_COMMIT_TAG  service/stat/
+    - docker push localhost:5005/root/waiter/stat
+    - docker build -t localhost:5005/root/waiter/sms:$CI_COMMIT_TAG  service/sms/
+    - docker push localhost:5005/root/waiter/sms
+    - docker build -t localhost:5005/root/waiter/notification:$CI_COMMIT_TAG  service/notification/
+    - docker push localhost:5005/root/waiter/notification
+
+
+job-deploy:
+  stage: deploy
+  image: alpine:latest
+  variables:
+    KUBE_NAMESPACE: staging
+    KUBE_VERSION : v1.11.2
+  only:
+    refs:
+      - tags
+    kubernetes: active
+  script:
+    - apk add -U openssl curl tar gzip bash ca-certificates git
+    - wget -q -O /etc/apk/keys/sgerrand.rsa.pub https://alpine-pkgs.sgerrand.com/sgerrand.rsa.pub
+    - wget https://github.com/sgerrand/alpine-pkg-glibc/releases/download/2.28-r0/glibc-2.28-r0.apk
+    - apk add glibc-2.28-r0.apk
+    - rm glibc-2.28-r0.apk
+    #  - curl "https://kubernetes-helm.storage.googleapis.com/helm-v2.6.1-linux-amd64.tar.gz" | tar zx
+    #  - mv linux-amd64/helm /usr/bin/
+    #  - helm version --client
+    - curl -L -o /usr/bin/kubectl "https://storage.googleapis.com/kubernetes-release/release/$KUBE_VERSION/bin/linux/amd64/kubectl"
+    - chmod +x /usr/bin/kubectl
+    - kubectl version --client
+    - kubectl cluster-info
+    - kubectl describe namespace "$KUBE_NAMESPACE" || kubectl create namespace "$KUBE_NAMESPACE"
+    #  - echo "Checking Tiller..."
+    #  - helm init --upgrade
+    #  - kubectl apply -f deployment.yml --namespace=$KUBE_NAMESPACE
+    - kubectl set image deployment/waiter-bot waiter-bot=localhost:5005/root/waiter/bot:$CI_COMMIT_TAG --namespace=$KUBE_NAMESPACE
+    - kubectl set image deployment/waiter-client  waiter-client=localhost:5005/root/waiter/client:$CI_COMMIT_TAG --namespace=$KUBE_NAMESPACE
+    - kubectl set image deployment/waiter-gateway waiter-gateway=localhost:5005/root/waiter/gateway:$CI_COMMIT_TAG --namespace=$KUBE_NAMESPACE
+    - kubectl set image deployment/waiter-menu waiter-menu=localhost:5005/root/waiter/menu:$CI_COMMIT_TAG --namespace=$KUBE_NAMESPACE
+    - kubectl set image deployment/waiter-notification waiter-notification=localhost:5005/root/waiter/notification:$CI_COMMIT_TAG --namespace=$KUBE_NAMESPACE
+    - kubectl set image deployment/waiter-sms waiter-sms=localhost:5005/root/waiter/sms:$CI_COMMIT_TAG --namespace=$KUBE_NAMESPACE
+    - kubectl set image deployment/waiter-store waiter-store=localhost:5005/root/waiter/store:$CI_COMMIT_TAG --namespace=$KUBE_NAMESPACE
+    - kubectl set image deployment/waiter-reservation-with-events-sink waiter-reservation-with-events-sink=localhost:5005/root/waiter/reservation/reservation-with-events-sink:$CI_COMMIT_TAG --namespace=$KUBE_NAMESPACE
+    - kubectl set image deployment/waiter-reservation-with-events-source waiter-reservation-with-events-source=localhost:5005/root/waiter/reservation/reservation-with-events-source:$CI_COMMIT_TAG --namespace=$KUBE_NAMESPACE
+    - export POD_NAMES=$(kubectl get pods -o go-template --template '{{range .items}}{{if eq .metadata.labels.component "speaker"}}{{.metadata.name}}{{" "}}{{end}}{{end}}' --namespace=metallb-system)
+    - kubectl delete pod $POD_NAMES --namespace=metallb-system

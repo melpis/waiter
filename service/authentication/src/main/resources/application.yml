@@ -1,0 +1,19 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: create
+    database: postgresql
+    properties:
+      hibernate:
+        temp:
+          use_jdbc_metadata_defaults: false
+  datasource:
+    url: jdbc:postgresql://localhost:5432/auth
+    driver-class-name: org.postgresql.Driver
+    username: pguser
+    password: 1234!@
+server:
+  port: 8040
+logging:
+  level:
+    ROOT: INFO
